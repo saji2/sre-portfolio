@@ -200,8 +200,8 @@ variable "alert_email" {
   default     = ""
 
   validation {
-    condition     = length(var.alert_email) > 0 && can(regex("^[^@]+@[^@]+\\.[^@]+$", var.alert_email))
-    error_message = "alert_email must be a valid email address for production deployments."
+    condition     = length(var.alert_email) > 0 && can(regex("^[^@]+@[^@]+\\.[^@]+$", var.alert_email)) && !can(regex("@example\\.(com|org|net)$", var.alert_email))
+    error_message = "alert_email must be a valid email address for production. Placeholder domains (example.com/org/net) are not allowed."
   }
 }
 
