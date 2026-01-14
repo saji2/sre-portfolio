@@ -14,7 +14,7 @@ single_nat_gateway   = true # Cost optimization: use single NAT Gateway
 enable_vpc_flow_logs = false
 
 # EKS
-cluster_version     = "1.29"
+cluster_version     = "1.30"
 node_instance_types = ["t3.medium"]
 node_capacity_type  = "ON_DEMAND"
 node_disk_size      = 20

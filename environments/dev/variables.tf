@@ -56,7 +56,7 @@ variable "enable_vpc_flow_logs" {
 variable "cluster_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.29"
+  default     = "1.30"
 }
 
 variable "eks_cluster_log_types" {
