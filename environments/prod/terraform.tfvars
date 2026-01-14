@@ -41,9 +41,10 @@ redis_automatic_failover = true
 redis_multi_az           = true
 
 # Monitoring
-# IMPORTANT: Set alert_email before production deployment to receive CloudWatch alarm notifications
+# IMPORTANT: alert_email is REQUIRED for production deployment
 # Validation will fail if empty, invalid format, or using placeholder domains (example.com/org/net)
-alert_email              = "" # REQUIRED: Set your actual ops team email (e.g., "ops@yourcompany.com")
+# Uncomment and set your actual ops team email address:
+# alert_email = "ops@yourcompany.com"
 log_retention_days       = 30
 create_cloudwatch_alarms = true
 

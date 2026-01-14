@@ -65,7 +65,7 @@ resource "random_password" "auth_token" {
   count            = var.transit_encryption_enabled ? 1 : 0
   length           = 64
   special          = true
-  override_special = "!#$%&*()-_=+[]{}?"
+  override_special = "!&#$^-" # AWS ElastiCache AUTH token allowed special chars
 }
 
 resource "aws_secretsmanager_secret" "redis" {

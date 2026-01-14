@@ -197,7 +197,7 @@ variable "redis_multi_az" {
 variable "alert_email" {
   description = "Email address for alerts (required for production)"
   type        = string
-  default     = ""
+  # No default - this is a required variable for production deployments
 
   validation {
     condition     = length(var.alert_email) > 0 && can(regex("^[^@]+@[^@]+\\.[^@]+$", var.alert_email)) && !can(regex("@example\\.(com|org|net)$", var.alert_email))
