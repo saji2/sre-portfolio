@@ -28,8 +28,8 @@ variable "engine_version" {
   default     = "15"
 
   validation {
-    condition     = can(regex("^(13|14|15|16)(\\.[0-9]+)?$", var.engine_version))
-    error_message = "Engine version must be a valid PostgreSQL version (13, 14, 15, or 16)."
+    condition     = can(regex("^(13|14|15|16|17)(\\.[0-9]+)?$", var.engine_version))
+    error_message = "Engine version must be a valid PostgreSQL version (13, 14, 15, 16, or 17)."
   }
 }
 

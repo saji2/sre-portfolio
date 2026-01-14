@@ -13,7 +13,7 @@ variable "cluster_version" {
   default     = "1.28"
 
   validation {
-    condition     = can(regex("^1\\.(2[7-9]|[3-9][0-9])$", var.cluster_version))
+    condition     = can(regex("^1\\.(2[7-9]|[3-9][0-9]|[1-9][0-9]{2,})$", var.cluster_version))
     error_message = "Cluster version must be 1.27 or higher."
   }
 }

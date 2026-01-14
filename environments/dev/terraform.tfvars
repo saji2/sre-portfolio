@@ -36,7 +36,7 @@ rds_deletion_protection   = false
 redis_engine_version     = "7.0"
 redis_node_type          = "cache.t3.micro"
 redis_num_cache_clusters = 2
-redis_automatic_failover = true
+redis_automatic_failover = false # Requires Multi-AZ, disable for cost optimization
 redis_multi_az           = false # Cost optimization: disable Multi-AZ for dev
 
 # Monitoring
