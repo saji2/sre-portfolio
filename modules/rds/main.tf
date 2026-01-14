@@ -106,14 +106,14 @@ resource "aws_secretsmanager_secret_version" "rds" {
 resource "aws_db_instance" "main" {
   identifier = "${var.project_name}-postgres"
 
-  engine               = "postgres"
-  engine_version       = var.engine_version
-  instance_class       = var.instance_class
-  allocated_storage    = var.allocated_storage
+  engine                = "postgres"
+  engine_version        = var.engine_version
+  instance_class        = var.instance_class
+  allocated_storage     = var.allocated_storage
   max_allocated_storage = var.max_allocated_storage
-  storage_type         = var.storage_type
-  storage_encrypted    = true
-  kms_key_id           = var.kms_key_id
+  storage_type          = var.storage_type
+  storage_encrypted     = true
+  kms_key_id            = var.kms_key_id
 
   db_name  = var.database_name
   username = var.master_username
@@ -126,13 +126,13 @@ resource "aws_db_instance" "main" {
   parameter_group_name   = aws_db_parameter_group.main.name
   publicly_accessible    = false
 
-  backup_retention_period = var.backup_retention_period
-  backup_window           = var.backup_window
-  maintenance_window      = var.maintenance_window
-  copy_tags_to_snapshot   = true
-  skip_final_snapshot     = var.skip_final_snapshot
+  backup_retention_period   = var.backup_retention_period
+  backup_window             = var.backup_window
+  maintenance_window        = var.maintenance_window
+  copy_tags_to_snapshot     = true
+  skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.project_name}-postgres-final-snapshot"
-  deletion_protection     = var.deletion_protection
+  deletion_protection       = var.deletion_protection
 
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null

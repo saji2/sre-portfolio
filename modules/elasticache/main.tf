@@ -62,9 +62,9 @@ resource "aws_elasticache_parameter_group" "main" {
 # Secrets Manager for auth token
 #------------------------------------------------------------------------------
 resource "random_password" "auth_token" {
-  count            = var.transit_encryption_enabled ? 1 : 0
-  length           = 64
-  special          = false
+  count   = var.transit_encryption_enabled ? 1 : 0
+  length  = 64
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "redis" {

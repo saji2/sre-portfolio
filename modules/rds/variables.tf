@@ -26,6 +26,11 @@ variable "engine_version" {
   description = "PostgreSQL engine version"
   type        = string
   default     = "15"
+
+  validation {
+    condition     = can(regex("^(13|14|15|16)(\\.[0-9]+)?$", var.engine_version))
+    error_message = "Engine version must be a valid PostgreSQL version (13, 14, 15, or 16)."
+  }
 }
 
 variable "instance_class" {
@@ -86,6 +91,11 @@ variable "backup_retention_period" {
   description = "Number of days to retain backups"
   type        = number
   default     = 7
+
+  validation {
+    condition     = var.backup_retention_period >= 0 && var.backup_retention_period <= 35
+    error_message = "Backup retention period must be between 0 and 35 days."
+  }
 }
 
 variable "backup_window" {
@@ -163,7 +173,7 @@ variable "cpu_utilization_threshold" {
 variable "free_storage_space_threshold" {
   description = "Free storage space threshold in bytes for alarm"
   type        = number
-  default     = 5368709120  # 5 GB
+  default     = 5368709120 # 5 GB
 }
 
 variable "database_connections_threshold" {

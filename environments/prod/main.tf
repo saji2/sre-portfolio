@@ -191,10 +191,10 @@ module "elasticache" {
 module "monitoring" {
   source = "../../modules/monitoring"
 
-  project_name   = var.project_name
-  aws_region     = var.aws_region
-  cluster_name   = local.cluster_name
-  alert_email    = var.alert_email
+  project_name = var.project_name
+  aws_region   = var.aws_region
+  cluster_name = local.cluster_name
+  alert_email  = var.alert_email
 
   log_retention_days      = var.log_retention_days
   rds_instance_identifier = module.rds.db_instance_identifier

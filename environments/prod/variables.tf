@@ -41,13 +41,13 @@ variable "enable_nat_gateway" {
 variable "single_nat_gateway" {
   description = "Use single NAT Gateway (cost optimization)"
   type        = bool
-  default     = false  # Production uses multiple NAT Gateways for HA
+  default     = false # Production uses multiple NAT Gateways for HA
 }
 
 variable "enable_vpc_flow_logs" {
   description = "Enable VPC Flow Logs"
   type        = bool
-  default     = true  # Enabled in production for security
+  default     = true # Enabled in production for security
 }
 
 #------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ variable "rds_engine_version" {
 variable "rds_instance_class" {
   description = "RDS instance class"
   type        = string
-  default     = "db.t3.small"  # Larger instance for production
+  default     = "db.t3.small" # Larger instance for production
 }
 
 variable "rds_allocated_storage" {
@@ -143,19 +143,19 @@ variable "rds_multi_az" {
 variable "rds_skip_final_snapshot" {
   description = "Skip final snapshot on deletion"
   type        = bool
-  default     = false  # Keep final snapshot in production
+  default     = false # Keep final snapshot in production
 }
 
 variable "rds_deletion_protection" {
   description = "Enable deletion protection"
   type        = bool
-  default     = true  # Enabled in production
+  default     = true # Enabled in production
 }
 
 variable "rds_performance_insights" {
   description = "Enable Performance Insights"
   type        = bool
-  default     = true  # Enabled in production
+  default     = true # Enabled in production
 }
 
 #------------------------------------------------------------------------------
@@ -170,13 +170,13 @@ variable "redis_engine_version" {
 variable "redis_node_type" {
   description = "ElastiCache node type"
   type        = string
-  default     = "cache.t3.small"  # Larger instance for production
+  default     = "cache.t3.small" # Larger instance for production
 }
 
 variable "redis_num_cache_clusters" {
   description = "Number of cache clusters (1 primary + replicas)"
   type        = number
-  default     = 3  # More replicas for production
+  default     = 3 # More replicas for production
 }
 
 variable "redis_automatic_failover" {
@@ -203,7 +203,7 @@ variable "alert_email" {
 variable "log_retention_days" {
   description = "CloudWatch log retention in days"
   type        = number
-  default     = 30  # Longer retention in production
+  default     = 30 # Longer retention in production
 }
 
 variable "create_cloudwatch_alarms" {

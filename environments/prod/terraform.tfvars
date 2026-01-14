@@ -8,13 +8,13 @@ project_name = "sre-portfolio"
 environment  = "prod"
 
 # VPC
-vpc_cidr           = "10.0.0.0/16"
-enable_nat_gateway = true
-single_nat_gateway = false  # Multiple NAT Gateways for HA
+vpc_cidr             = "10.0.0.0/16"
+enable_nat_gateway   = true
+single_nat_gateway   = false # Multiple NAT Gateways for HA
 enable_vpc_flow_logs = true
 
 # EKS
-cluster_version    = "1.28"
+cluster_version     = "1.28"
 node_instance_types = ["t3.medium"]
 node_capacity_type  = "ON_DEMAND"
 node_disk_size      = 30
@@ -34,15 +34,15 @@ rds_deletion_protection   = true
 rds_performance_insights  = true
 
 # Redis
-redis_engine_version      = "7.0"
-redis_node_type           = "cache.t3.small"
-redis_num_cache_clusters  = 3
-redis_automatic_failover  = true
-redis_multi_az            = true
+redis_engine_version     = "7.0"
+redis_node_type          = "cache.t3.small"
+redis_num_cache_clusters = 3
+redis_automatic_failover = true
+redis_multi_az           = true
 
 # Monitoring
-alert_email           = ""  # Set your email address here
-log_retention_days    = 30
+alert_email              = "" # Set your email address here
+log_retention_days       = 30
 create_cloudwatch_alarms = true
 
 # Helm Charts

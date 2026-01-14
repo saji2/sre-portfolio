@@ -11,6 +11,11 @@ variable "cluster_version" {
   description = "Kubernetes version for the EKS cluster"
   type        = string
   default     = "1.28"
+
+  validation {
+    condition     = can(regex("^1\\.(2[7-9]|[3-9][0-9])$", var.cluster_version))
+    error_message = "Cluster version must be 1.27 or higher."
+  }
 }
 
 variable "vpc_id" {
@@ -57,6 +62,11 @@ variable "capacity_type" {
   description = "Capacity type for the node group (ON_DEMAND or SPOT)"
   type        = string
   default     = "ON_DEMAND"
+
+  validation {
+    condition     = contains(["ON_DEMAND", "SPOT"], var.capacity_type)
+    error_message = "Capacity type must be either ON_DEMAND or SPOT."
+  }
 }
 
 variable "node_disk_size" {

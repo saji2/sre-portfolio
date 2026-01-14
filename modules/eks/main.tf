@@ -60,6 +60,7 @@ resource "aws_security_group_rule" "cluster_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.cluster.id
+  description       = "Allow cluster control plane to communicate with nodes and external services"
 }
 
 #------------------------------------------------------------------------------
@@ -188,13 +189,13 @@ resource "aws_security_group" "node_group" {
 }
 
 resource "aws_security_group_rule" "node_group_ingress_self" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "-1"
-  self                     = true
-  security_group_id        = aws_security_group.node_group.id
-  description              = "Allow node to communicate with each other"
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  self              = true
+  security_group_id = aws_security_group.node_group.id
+  description       = "Allow node to communicate with each other"
 }
 
 resource "aws_security_group_rule" "node_group_ingress_cluster" {
@@ -214,6 +215,7 @@ resource "aws_security_group_rule" "node_group_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.node_group.id
+  description       = "Allow nodes to communicate with external services"
 }
 
 resource "aws_security_group_rule" "cluster_ingress_node" {
