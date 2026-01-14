@@ -40,9 +40,9 @@ redis_automatic_failover = false # Requires Multi-AZ and multiple nodes
 redis_multi_az           = false # Cost optimization: disable Multi-AZ for dev
 
 # Monitoring
-alert_email              = "" # Set your email address here
+alert_email              = "" # Optional: Set email to receive alerts in dev
 log_retention_days       = 7
-create_cloudwatch_alarms = true
+create_cloudwatch_alarms = false # Disabled in dev (no alert_email configured)
 
 # Helm Charts
 install_aws_lb_controller  = true

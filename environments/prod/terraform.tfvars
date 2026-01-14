@@ -41,9 +41,9 @@ redis_automatic_failover = true
 redis_multi_az           = true
 
 # Monitoring
-# IMPORTANT: alert_email is REQUIRED for production deployment
-# Validation will fail if empty, invalid format, or using placeholder domains (example.com/org/net)
-# Uncomment and set your actual ops team email address:
+# REQUIRED: alert_email MUST be set for terraform plan/apply to succeed.
+# Validation will fail if empty, invalid format, or using placeholder domains (example.com/org/net).
+# Uncomment and replace with your actual ops team email address:
 # alert_email = "ops@yourcompany.com"
 log_retention_days       = 30
 create_cloudwatch_alarms = true
