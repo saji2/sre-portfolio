@@ -42,7 +42,8 @@ redis_multi_az           = true
 
 # Monitoring
 # IMPORTANT: Set alert_email before production deployment to receive CloudWatch alarm notifications
-alert_email              = "" # Required: Set your ops team email address (e.g., "ops@example.com")
+# The validation will fail if this is empty or invalid - this is intentional for production safety
+alert_email              = "ops-team@example.com" # CHANGE THIS to your actual ops team email
 log_retention_days       = 30
 create_cloudwatch_alarms = true
 

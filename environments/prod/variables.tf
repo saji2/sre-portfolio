@@ -195,9 +195,14 @@ variable "redis_multi_az" {
 # Monitoring
 #------------------------------------------------------------------------------
 variable "alert_email" {
-  description = "Email address for alerts"
+  description = "Email address for alerts (required for production)"
   type        = string
   default     = ""
+
+  validation {
+    condition     = length(var.alert_email) > 0 && can(regex("^[^@]+@[^@]+\\.[^@]+$", var.alert_email))
+    error_message = "alert_email must be a valid email address for production deployments."
+  }
 }
 
 variable "log_retention_days" {
