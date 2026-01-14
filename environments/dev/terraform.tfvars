@@ -28,7 +28,7 @@ rds_instance_class        = "db.t3.micro"
 rds_allocated_storage     = 20
 rds_max_allocated_storage = 100
 rds_database_name         = "taskmanager"
-rds_multi_az              = true
+rds_multi_az              = false # Cost optimization: disable Multi-AZ for dev
 rds_skip_final_snapshot   = true
 rds_deletion_protection   = false
 
@@ -37,7 +37,7 @@ redis_engine_version     = "7.0"
 redis_node_type          = "cache.t3.micro"
 redis_num_cache_clusters = 2
 redis_automatic_failover = true
-redis_multi_az           = true
+redis_multi_az           = false # Cost optimization: disable Multi-AZ for dev
 
 # Monitoring
 alert_email              = "" # Set your email address here

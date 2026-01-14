@@ -191,7 +191,7 @@ resource "aws_security_group" "node_group" {
 resource "aws_security_group_rule" "node_group_ingress_self" {
   type              = "ingress"
   from_port         = 0
-  to_port           = 65535
+  to_port           = 0
   protocol          = "-1"
   self              = true
   security_group_id = aws_security_group.node_group.id
@@ -201,7 +201,7 @@ resource "aws_security_group_rule" "node_group_ingress_self" {
 resource "aws_security_group_rule" "node_group_ingress_cluster" {
   type                     = "ingress"
   from_port                = 0
-  to_port                  = 65535
+  to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.cluster.id
   security_group_id        = aws_security_group.node_group.id

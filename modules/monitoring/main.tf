@@ -332,6 +332,7 @@ resource "aws_iam_role" "fluent_bit" {
 
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 resource "aws_iam_role_policy" "fluent_bit" {
   count = var.create_fluent_bit_role ? 1 : 0
@@ -351,8 +352,8 @@ resource "aws_iam_role_policy" "fluent_bit" {
           "logs:DescribeLogGroups"
         ]
         Resource = [
-          "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}/*",
-          "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}/*:*"
+          "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}/*",
+          "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/eks/${var.cluster_name}/*:*"
         ]
       }
     ]
