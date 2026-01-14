@@ -14,7 +14,7 @@ single_nat_gateway   = true # Cost optimization: use single NAT Gateway
 enable_vpc_flow_logs = false
 
 # EKS
-cluster_version     = "1.28"
+cluster_version     = "1.29"
 node_instance_types = ["t3.medium"]
 node_capacity_type  = "ON_DEMAND"
 node_disk_size      = 20
@@ -35,8 +35,8 @@ rds_deletion_protection   = false
 # Redis
 redis_engine_version     = "7.0"
 redis_node_type          = "cache.t3.micro"
-redis_num_cache_clusters = 2
-redis_automatic_failover = false # Requires Multi-AZ, disable for cost optimization
+redis_num_cache_clusters = 1     # Single node for cost optimization in dev
+redis_automatic_failover = false # Requires Multi-AZ and multiple nodes
 redis_multi_az           = false # Cost optimization: disable Multi-AZ for dev
 
 # Monitoring

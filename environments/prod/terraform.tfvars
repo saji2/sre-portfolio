@@ -14,7 +14,7 @@ single_nat_gateway   = false # Multiple NAT Gateways for HA
 enable_vpc_flow_logs = true
 
 # EKS
-cluster_version     = "1.28"
+cluster_version     = "1.29"
 node_instance_types = ["t3.medium"]
 node_capacity_type  = "ON_DEMAND"
 node_disk_size      = 30
