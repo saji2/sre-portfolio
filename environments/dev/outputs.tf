@@ -137,3 +137,16 @@ output "fluent_bit_role_arn" {
   description = "ARN of the Fluent Bit IAM role"
   value       = module.monitoring.fluent_bit_role_arn
 }
+
+#------------------------------------------------------------------------------
+# ECR
+#------------------------------------------------------------------------------
+output "ecr_api_repository_url" {
+  description = "URL of the API ECR repository"
+  value       = module.ecr.api_repository_url
+}
+
+output "ecr_frontend_repository_url" {
+  description = "URL of the Frontend ECR repository"
+  value       = module.ecr.frontend_repository_url
+}

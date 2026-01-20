@@ -143,7 +143,7 @@ module "rds" {
   project_name              = var.project_name
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.private_data_subnet_ids
-  allowed_security_group_id = module.eks.node_group_security_group_id
+  allowed_security_group_id = module.eks.cluster_primary_security_group_id
 
   engine_version        = var.rds_engine_version
   instance_class        = var.rds_instance_class
@@ -169,7 +169,7 @@ module "elasticache" {
   project_name              = var.project_name
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.private_data_subnet_ids
-  allowed_security_group_id = module.eks.node_group_security_group_id
+  allowed_security_group_id = module.eks.cluster_primary_security_group_id
 
   engine_version             = var.redis_engine_version
   node_type                  = var.redis_node_type
@@ -237,6 +237,16 @@ resource "helm_release" "aws_load_balancer_controller" {
     value = module.eks.aws_lb_controller_role_arn
   }
 
+  set {
+    name  = "vpcId"
+    value = module.vpc.vpc_id
+  }
+
+  set {
+    name  = "region"
+    value = var.aws_region
+  }
+
   depends_on = [module.eks]
 }
 
@@ -293,4 +303,14 @@ resource "helm_release" "metrics_server" {
   version    = var.metrics_server_version
 
   depends_on = [module.eks]
+}
+
+#------------------------------------------------------------------------------
+# ECR Module
+#------------------------------------------------------------------------------
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name = var.project_name
+  tags         = local.common_tags
 }
