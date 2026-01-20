@@ -216,11 +216,13 @@ kubeProxy:
 ### 3.3 Helm インストール
 
 ```bash
-helm install prometheus-stack prometheus-community/kube-prometheus-stack \
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
-  -f k8s/monitoring/prometheus-stack-values.yaml \
-  --wait --timeout 10m
+  --values k8s/monitoring/prometheus-stack-values.yaml \
+  --wait --timeout 5m
 ```
+
+> **注意:** `helm upgrade --install` を使用することで、新規インストールと更新の両方に対応できます。
 
 ### 3.4 デプロイ確認
 
@@ -236,14 +238,18 @@ kubectl get svc -n monitoring
 
 ```bash
 # Grafana の外部 URL を取得
-kubectl get svc prometheus-stack-grafana -n monitoring \
+kubectl get svc kube-prometheus-stack-grafana -n monitoring \
   -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+
+# パスワードの確認
+kubectl get secrets kube-prometheus-stack-grafana -n monitoring \
+  -o jsonpath="{.data.admin-password}" | base64 -d && echo
 ```
 
 **アクセス情報:**
 - URL: `http://<EXTERNAL-IP>`
 - ユーザー: `admin`
-- パスワード: `SrePortfolio2024!`
+- パスワード: `SrePortfolio2024!`（values.yaml で設定）
 
 ---
 
@@ -473,7 +479,54 @@ aws iam get-role --role-name sre-portfolio-fluent-bit-role
 1. Terraform の monitoring モジュールで OIDC プロバイダー URL が正しいか確認
 2. IAM ロールの信頼ポリシーが正しい Namespace と ServiceAccount を指定しているか確認
 
-### 6.3 Grafana LoadBalancer に EXTERNAL-IP が割り当てられない
+### 6.3 Node Exporter が Pending 状態（ポート競合）
+
+**症状:**
+```bash
+kubectl get pods -n monitoring
+# kube-prometheus-stack-prometheus-node-exporter-xxxxx   0/1   Pending
+```
+
+**イベントログ:**
+```bash
+kubectl describe pod <node-exporter-pod> -n monitoring
+# Warning  FailedScheduling  0/3 nodes are available: 1 node(s) didn't have free ports for the requested pod ports
+```
+
+**原因:**
+複数の Prometheus スタックがインストールされており、既存の node-exporter がポート 9100 を使用している。
+
+**確認方法:**
+```bash
+# Helm リリースの確認
+helm list -n monitoring
+
+# 出力例（複数のリリースがある場合）:
+# NAME                  NAMESPACE   REVISION  STATUS
+# kube-prometheus-stack monitoring  1         failed
+# prometheus-stack      monitoring  2         deployed
+```
+
+**解決方法:**
+古いリリースを削除して、新しいリリースを再インストール。
+
+```bash
+# 既存のリリースを全て削除
+helm uninstall prometheus-stack -n monitoring
+helm uninstall kube-prometheus-stack -n monitoring
+
+# Pod が削除されるまで待機
+sleep 10
+kubectl get pods -n monitoring
+
+# 新しいリリースをインストール
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --values k8s/monitoring/prometheus-stack-values.yaml \
+  --wait --timeout 5m
+```
+
+### 6.4 Grafana LoadBalancer に EXTERNAL-IP が割り当てられない
 
 **症状:**
 ```bash
@@ -516,7 +569,7 @@ helm upgrade prometheus-stack prometheus-community/kube-prometheus-stack \
 
 ```bash
 # kube-prometheus-stack の削除
-helm uninstall prometheus-stack -n monitoring
+helm uninstall kube-prometheus-stack -n monitoring
 
 # Fluent Bit の削除
 helm uninstall fluent-bit -n monitoring
@@ -567,7 +620,121 @@ kubectl delete crd thanosrulers.monitoring.coreos.com
 
 ---
 
-## 10. 次のステップ
+## 10. 実行記録
+
+### 10.1 デプロイ日時
+
+**実行日:** 2026-01-20
+
+### 10.2 実行手順
+
+#### Step 1: EKSクラスタ接続確認
+
+```bash
+kubectl cluster-info
+# Kubernetes control plane is running at https://xxxxx.gr7.ap-northeast-1.eks.amazonaws.com
+```
+
+#### Step 2: monitoring Namespace 確認
+
+```bash
+kubectl get ns monitoring
+# NAME         STATUS   AGE
+# monitoring   Active   23h
+```
+
+> Namespace は既に存在していたため、作成をスキップ。
+
+#### Step 3: Helm リポジトリの追加・更新
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
+
+#### Step 4: kube-prometheus-stack のデプロイ
+
+**初回デプロイ時にタイムアウトが発生:**
+```bash
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --values k8s/monitoring/prometheus-stack-values.yaml \
+  --wait --timeout 10m
+
+# Error: resource not ready, name: kube-prometheus-stack-prometheus-node-exporter, kind: DaemonSet
+```
+
+**原因調査:**
+```bash
+kubectl describe pod kube-prometheus-stack-prometheus-node-exporter-xxxxx -n monitoring
+# Warning  FailedScheduling  0/3 nodes are available: 1 node(s) didn't have free ports for the requested pod ports
+```
+
+古い `prometheus-stack` リリースの node-exporter がポート 9100 を使用していた。
+
+**解決:**
+```bash
+# 既存リリースを削除
+helm uninstall prometheus-stack -n monitoring
+helm uninstall kube-prometheus-stack -n monitoring
+
+# 待機
+sleep 10
+
+# 再インストール
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --values k8s/monitoring/prometheus-stack-values.yaml \
+  --wait --timeout 5m
+
+# 成功
+# NAME: kube-prometheus-stack
+# LAST DEPLOYED: Tue Jan 20 17:26:31 2026
+# STATUS: deployed
+```
+
+#### Step 5: デプロイ確認
+
+```bash
+kubectl get pods -n monitoring
+
+# NAME                                                        READY   STATUS    RESTARTS   AGE
+# alertmanager-kube-prometheus-stack-alertmanager-0           2/2     Running   0          46s
+# fluent-bit-aws-for-fluent-bit-766cd                         1/1     Running   0          26h
+# fluent-bit-aws-for-fluent-bit-8mkfs                         1/1     Running   0          26h
+# fluent-bit-aws-for-fluent-bit-gnww7                         1/1     Running   0          26h
+# kube-prometheus-stack-grafana-848fc4f7cf-xmmz6              3/3     Running   0          52s
+# kube-prometheus-stack-kube-state-metrics-6f7cc7689c-gm9zj   1/1     Running   0          52s
+# kube-prometheus-stack-operator-74c9dd77c8-wt72j             1/1     Running   0          52s
+# kube-prometheus-stack-prometheus-node-exporter-jd5dl        1/1     Running   0          52s
+# kube-prometheus-stack-prometheus-node-exporter-phwqj        1/1     Running   0          52s
+# kube-prometheus-stack-prometheus-node-exporter-t4zzv        1/1     Running   0          52s
+# prometheus-kube-prometheus-stack-prometheus-0               2/2     Running   0          45s
+```
+
+### 10.3 最終確認結果
+
+| コンポーネント | 状態 | Pod数 |
+|--------------|------|-------|
+| Prometheus | Running | 1 |
+| Grafana | Running | 1 |
+| Alertmanager | Running | 1 |
+| Node Exporter | Running | 3 (各ノード) |
+| kube-state-metrics | Running | 1 |
+| Prometheus Operator | Running | 1 |
+| Fluent Bit | Running | 3 (各ノード) |
+
+### 10.4 Grafana アクセス情報
+
+| 項目 | 値 |
+|------|---|
+| URL | http://k8s-monitori-kubeprom-90e861fc74-f29b4147cd4a1bc8.elb.ap-northeast-1.amazonaws.com |
+| ユーザー | admin |
+| パスワード | SrePortfolio2024! |
+
+---
+
+## 11. 次のステップ
 
 - [ ] アプリケーション用 ServiceMonitor の作成
 - [ ] Golden Signals ダッシュボードの作成
