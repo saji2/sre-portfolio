@@ -563,14 +563,32 @@ kubectl top pods -n app-production
 
 ### A. 環境削除
 
+> **重要:** 削除順序を守らないと、AWS リソース（NLB, ENI）が残留し、手動クリーンアップが必要になります。
+
 ```bash
-# Kubernetes リソース削除
+# 1. 監視基盤の削除（Helm リリース）
+helm uninstall kube-prometheus-stack -n monitoring
+helm uninstall fluent-bit -n monitoring
+
+# 2. アプリケーションリソースの削除
 kubectl delete -f k8s/base/
 
-# Terraform リソース削除
+# 3. Namespace の削除
+kubectl delete ns app-production
+kubectl delete ns monitoring
+
+# 4. ALB/NLB が完全に削除されるまで待機（1-2分）
+echo "Waiting for AWS resources cleanup..."
+sleep 60
+
+# 5. Terraform リソース削除
 cd environments/dev
 terraform destroy -var="alert_email=your-email@example.com"
 ```
+
+**削除順序の理由:**
+- Grafana の NLB が残った状態で VPC を削除しようとすると失敗する
+- Ingress (ALB) を先に削除しないとサブネット削除が失敗する
 
 ### B. API エンドポイント一覧
 
