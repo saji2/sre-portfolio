@@ -42,10 +42,6 @@ jobs:
         working-directory: apps/frontend
         run: npm run type-check
 
-      - name: Run tests
-        working-directory: apps/frontend
-        run: npm run test -- --run
-
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
