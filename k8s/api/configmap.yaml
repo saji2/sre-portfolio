@@ -1,0 +1,20 @@
+#------------------------------------------------------------------------------
+# ConfigMap for API Service - TEMPLATE FILE
+#------------------------------------------------------------------------------
+# DO NOT apply this file directly!
+# Use kubectl commands to create ConfigMap (see DEPLOYMENT_GUIDE_PROD.md Step 3)
+#
+# This file is provided as a reference template showing the expected structure.
+#------------------------------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: app-production
+data:
+  # Replace with actual Redis endpoint from: terraform output redis_primary_endpoint
+  REDIS_HOST: "${REDIS_PRIMARY_ENDPOINT}"
+  REDIS_PORT: "6379"
+  LOG_LEVEL: "info"
+  # Restrict CORS in production for security
+  CORS_ALLOWED_ORIGINS: "${ALLOWED_ORIGINS}"

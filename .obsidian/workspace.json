@@ -1,0 +1,208 @@
+{
+  "main": {
+    "id": "d337cb5409a5f0e5",
+    "type": "split",
+    "children": [
+      {
+        "id": "f4a57bf302a45838",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2553165624d44b0a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/coaching-log.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "coaching-log"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "f848bf8aa146cbda",
+    "type": "split",
+    "children": [
+      {
+        "id": "ea2f2f3223ab83cd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4e7e267324d13f11",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "ファイルエクスプローラ"
+            }
+          },
+          {
+            "id": "4f02083c42302f96",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "検索"
+            }
+          },
+          {
+            "id": "628140c38b7ed0f5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "ブックマーク"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "6595b6a587f237a7",
+    "type": "split",
+    "children": [
+      {
+        "id": "81bfdc92d26de6a5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "87406a3fd18f5c5d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/coaching-log.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "coaching-logへのバックリンク"
+            }
+          },
+          {
+            "id": "cc99e7736672c323",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "docs/coaching-log.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "coaching-logからのアウトゴーイングリンク"
+            }
+          },
+          {
+            "id": "0a8d7dd31f8c8d21",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "タグ"
+            }
+          },
+          {
+            "id": "8409c16f88bd17a6",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "すべてのプロパティ"
+            }
+          },
+          {
+            "id": "db541f13424a32f7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "docs/coaching-log.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "coaching-logのアウトライン"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:クイックスイッチャーを開く": false,
+      "graph:グラフビューを開く": false,
+      "canvas:新規キャンバスを作成": false,
+      "daily-notes:今日のデイリーノートを開く": false,
+      "templates:テンプレートを挿入": false,
+      "command-palette:コマンドパレットを開く": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "2553165624d44b0a",
+  "lastOpenFiles": [
+    "docs/terraform-k8s-練習問題.md",
+    "OPERATION_PURPOSE.md",
+    "docs/PHASE3_CHAOS_ENGINEERING_GUIDE.md",
+    "docs/PHASE2_INCIDENT_RESPONSE_GUIDE.md",
+    "docs/coaching-log.md",
+    "DEPLOYMENT_GUIDE.md",
+    "docs/PHASE1_CICD_GUIDE.md",
+    "CHAOS_ENGINEERING.md",
+    "k8s/chaos/memory-stress-pod.yaml",
+    "k8s/chaos/stress-pod.yaml",
+    "scripts/chaos-validate.sh",
+    "scripts/chaos-test.sh",
+    "docs/POST_INCIDENT_REVIEW_TEMPLATE.md",
+    "docs/INCIDENT_RESPONSE.md",
+    "environments/backend/main.tf",
+    "k8s/chaos",
+    "docs",
+    "environments/backend",
+    "DEPLOYMENT_GUIDE_PROD.md"
+  ]
+}

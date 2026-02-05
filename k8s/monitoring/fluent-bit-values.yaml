@@ -1,0 +1,57 @@
+# Fluent Bit configuration for CloudWatch Logs
+# AWS for Fluent Bit Helm chart values
+
+serviceAccount:
+  create: true
+  name: fluent-bit
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::202516977224:role/sre-portfolio-fluent-bit-role
+
+cloudWatchLogs:
+  enabled: true
+  region: ap-northeast-1
+  logGroupName: "/aws/eks/sre-portfolio-cluster/application"
+  logGroupTemplate: "/aws/eks/sre-portfolio-cluster/$kubernetes['namespace_name']"
+  logStreamPrefix: "fb-"
+  autoCreateGroup: true
+
+firehose:
+  enabled: false
+
+kinesis:
+  enabled: false
+
+elasticsearch:
+  enabled: false
+
+input:
+  tail:
+    enabled: true
+    tag: "kube.*"
+    path: "/var/log/containers/*.log"
+    parser: docker
+    memBufLimit: 5MB
+    skipLongLines: "On"
+    refreshInterval: 10
+
+filter:
+  kubeURL: "https://kubernetes.default.svc:443"
+  kubeCAFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+  kubeTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+  mergeLog: "On"
+  mergeLogKey: "log_processed"
+  keepLog: "On"
+  k8sLoggingParser: "On"
+  k8sLoggingExclude: "Off"
+
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi

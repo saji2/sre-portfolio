@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: memory-stress-test
+  namespace: app-production
+  labels:
+    app: chaos-test
+    experiment: memory-stress
+spec:
+  containers:
+    - name: stress
+      image: progrium/stress:latest
+      command:
+        - stress
+      args:
+        - "--vm"
+        - "2"
+        - "--vm-bytes"
+        - "256M"
+        - "--timeout"
+        - "300"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 5

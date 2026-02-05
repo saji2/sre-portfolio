@@ -1,0 +1,81 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+*.tfplan
+*.plan
+terraform.tfplan
+*.tfplan.json
+
+# Backup files
+*.bak
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# Secrets - never commit these
+*.pem
+*.key
+secrets.yaml
+secrets.yml
+.env
+.env.*
+!.env.example
+!.env.template
+
+# AWS credentials
+.aws/
+
+# SSH keys
+.ssh/
+id_rsa
+id_rsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+known_hosts
+
+# Node.js
+node_modules/
+
+# Kubernetes / EKS
+.kube/
+# Kubeconfig files (explicit patterns to avoid matching docs/scripts)
+kubeconfig
+kubeconfig.yaml
+kubeconfig.json
+.kubeconfig
+kubeconfig-*
+*-kubeconfig
+# Environment-specific Helm values (base values should be committed)
+helm-values-*.yaml
+helm-values.*.yaml

@@ -1,0 +1,37 @@
+#------------------------------------------------------------------------------
+# Kustomization for API Service
+#
+# Usage:
+#   1. Update the ECR image URL below (get from: terraform output ecr_api_repository_url)
+#   2. Create Secrets/ConfigMap per DEPLOYMENT_GUIDE_PROD.md Step 3
+#   3. kubectl apply -k k8s/api/
+#------------------------------------------------------------------------------
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: app-production
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - hpa.yaml
+  - ingress.yaml
+
+#------------------------------------------------------------------------------
+# IMPORTANT: Update the newName below with your actual ECR repository URL
+# Get the URL with: terraform output ecr_api_repository_url
+#------------------------------------------------------------------------------
+images:
+  - name: api-service
+    newName: 202516977224.dkr.ecr.ap-northeast-1.amazonaws.com/sre-portfolio/api  # e.g., 123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/sre-portfolio-prod/api
+    newTag: latest
+
+# NOTE: secrets.yaml and configmap.yaml are NOT included
+# Create them using kubectl commands per DEPLOYMENT_GUIDE_PROD.md Step 3
+
+commonLabels:
+  app.kubernetes.io/name: api-service
+  app.kubernetes.io/part-of: sre-portfolio
+  app.kubernetes.io/managed-by: kustomize

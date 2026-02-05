@@ -1,0 +1,21 @@
+# Dependencies
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Test files
+*_test.go
+
+# Git
+.git/
+.gitignore
