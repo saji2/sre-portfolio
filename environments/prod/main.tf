@@ -29,14 +29,13 @@ terraform {
     }
   }
 
-  # Uncomment to use S3 backend
-  # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
-  #   key            = "sre-portfolio/prod/terraform.tfstate"
-  #   region         = "ap-northeast-1"
-  #   dynamodb_table = "terraform-state-lock"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "sre-portfolio-terraform-state"
+    key            = "sre-portfolio/prod/terraform.tfstate"
+    region         = "ap-northeast-1"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -143,7 +142,7 @@ module "rds" {
   project_name              = var.project_name
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.private_data_subnet_ids
-  allowed_security_group_id = module.eks.node_group_security_group_id
+  allowed_security_group_id = module.eks.cluster_primary_security_group_id
 
   engine_version        = var.rds_engine_version
   instance_class        = var.rds_instance_class
@@ -153,8 +152,6 @@ module "rds" {
   multi_az              = var.rds_multi_az
   skip_final_snapshot   = var.rds_skip_final_snapshot
   deletion_protection   = var.rds_deletion_protection
-
-  performance_insights_enabled = var.rds_performance_insights
 
   create_cloudwatch_alarms = var.create_cloudwatch_alarms
   alarm_actions            = var.create_cloudwatch_alarms ? [module.monitoring.sns_topic_arn] : []
@@ -171,7 +168,7 @@ module "elasticache" {
   project_name              = var.project_name
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.private_data_subnet_ids
-  allowed_security_group_id = module.eks.node_group_security_group_id
+  allowed_security_group_id = module.eks.cluster_primary_security_group_id
 
   engine_version             = var.redis_engine_version
   node_type                  = var.redis_node_type
@@ -239,6 +236,16 @@ resource "helm_release" "aws_load_balancer_controller" {
     value = module.eks.aws_lb_controller_role_arn
   }
 
+  set {
+    name  = "vpcId"
+    value = module.vpc.vpc_id
+  }
+
+  set {
+    name  = "region"
+    value = var.aws_region
+  }
+
   depends_on = [module.eks]
 }
 
@@ -295,4 +302,14 @@ resource "helm_release" "metrics_server" {
   version    = var.metrics_server_version
 
   depends_on = [module.eks]
+}
+
+#------------------------------------------------------------------------------
+# ECR Module
+#------------------------------------------------------------------------------
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name = var.project_name
+  tags         = local.common_tags
 }

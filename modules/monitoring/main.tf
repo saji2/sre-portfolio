@@ -328,6 +328,13 @@ resource "aws_iam_role" "fluent_bit" {
   })
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.oidc_provider_arn != "" && var.oidc_provider_url != ""
+      error_message = "oidc_provider_arn and oidc_provider_url are required when create_fluent_bit_role is true."
+    }
+  }
 }
 
 data "aws_region" "current" {}

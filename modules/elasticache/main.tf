@@ -123,6 +123,13 @@ resource "aws_elasticache_replication_group" "main" {
   tags = merge(var.tags, {
     Name = "${var.project_name}-redis"
   })
+
+  lifecycle {
+    precondition {
+      condition     = ((!var.automatic_failover_enabled && !var.multi_az_enabled) || var.num_cache_clusters >= 2)
+      error_message = "num_cache_clusters must be >= 2 when automatic_failover_enabled or multi_az_enabled is true."
+    }
+  }
 }
 
 #------------------------------------------------------------------------------

@@ -29,14 +29,13 @@ terraform {
     }
   }
 
-  # Uncomment to use S3 backend
-  # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
-  #   key            = "sre-portfolio/dev/terraform.tfstate"
-  #   region         = "ap-northeast-1"
-  #   dynamodb_table = "terraform-state-lock"
-  #   encrypt        = true
-  # }
+  backend "s3" {
+    bucket         = "sre-portfolio-terraform-state"
+    key            = "sre-portfolio/dev/terraform.tfstate"
+    region         = "ap-northeast-1"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
 }
 
 #------------------------------------------------------------------------------

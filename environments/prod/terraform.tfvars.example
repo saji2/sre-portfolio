@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------
 # SRE Portfolio - Production Environment Configuration
 #------------------------------------------------------------------------------
+# Copy this file to terraform.tfvars and customize values as needed:
+#   cp terraform.tfvars.example terraform.tfvars
+#------------------------------------------------------------------------------
 
 # General
 aws_region   = "ap-northeast-1"
@@ -29,8 +32,8 @@ rds_allocated_storage     = 50
 rds_max_allocated_storage = 200
 rds_database_name         = "taskmanager"
 rds_multi_az              = true
-rds_skip_final_snapshot   = false
-rds_deletion_protection   = true
+rds_skip_final_snapshot   = true
+rds_deletion_protection   = false
 rds_performance_insights  = true
 
 # Redis
@@ -43,8 +46,8 @@ redis_multi_az           = true
 # Monitoring
 # REQUIRED: alert_email MUST be set for terraform plan/apply to succeed.
 # Validation will fail if empty, invalid format, or using placeholder domains (example.com/org/net).
-# Uncomment and replace with your actual ops team email address:
-# alert_email = "ops@yourcompany.com"
+# Replace with your actual ops team email address:
+alert_email              = "your-email@your-domain.com"
 log_retention_days       = 30
 create_cloudwatch_alarms = true
 

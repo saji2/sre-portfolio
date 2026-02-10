@@ -152,12 +152,6 @@ variable "rds_deletion_protection" {
   default     = true # Enabled in production
 }
 
-variable "rds_performance_insights" {
-  description = "Enable Performance Insights"
-  type        = bool
-  default     = true # Enabled in production
-}
-
 #------------------------------------------------------------------------------
 # ElastiCache (Redis)
 #------------------------------------------------------------------------------

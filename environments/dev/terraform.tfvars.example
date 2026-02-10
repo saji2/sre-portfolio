@@ -1,6 +1,9 @@
 #------------------------------------------------------------------------------
 # SRE Portfolio - Development Environment Configuration
 #------------------------------------------------------------------------------
+# Copy this file to terraform.tfvars and customize values as needed:
+#   cp terraform.tfvars.example terraform.tfvars
+#------------------------------------------------------------------------------
 
 # General
 aws_region   = "ap-northeast-1"

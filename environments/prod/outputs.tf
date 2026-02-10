@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# SRE Portfolio - Development Environment Outputs
+# SRE Portfolio - Production Environment Outputs
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -52,6 +52,11 @@ output "cluster_certificate_authority_data" {
 output "cluster_security_group_id" {
   description = "Security group ID of the EKS cluster"
   value       = module.eks.cluster_security_group_id
+}
+
+output "cluster_primary_security_group_id" {
+  description = "Primary security group ID of the EKS cluster (used for RDS/ElastiCache access)"
+  value       = module.eks.cluster_primary_security_group_id
 }
 
 output "node_group_security_group_id" {
@@ -136,7 +141,7 @@ output "cloudwatch_dashboard_name" {
 }
 
 output "fluent_bit_role_arn" {
-  description = "ARN of the Fluent Bit IAM role"
+  description = "ARN of the Fluent Bit IAM role (may be null if not created)"
   value       = module.monitoring.fluent_bit_role_arn
 }
 

@@ -1,0 +1,261 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: api-service-alerts
+  namespace: monitoring
+  labels:
+    app: api-service
+    release: prometheus
+    role: alert-rules
+spec:
+  groups:
+    # ============================================
+    # Latency Alerts
+    # ============================================
+    - name: api-service-latency
+      rules:
+        - alert: APIHighLatencyWarning
+          expr: |
+            histogram_quantile(0.99,
+              sum(rate(http_request_duration_seconds_bucket{namespace="app-production", service="api-service"}[5m])) by (le)
+            ) > 0.5
+          for: 5m
+          labels:
+            severity: warning
+            service: api-service
+            signal: latency
+          annotations:
+            summary: "API Service high latency warning"
+            description: "P99 latency is above 500ms (current: {{ $value | printf \"%.2f\" }}s) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-latency.md"
+
+        - alert: APIHighLatencyCritical
+          expr: |
+            histogram_quantile(0.99,
+              sum(rate(http_request_duration_seconds_bucket{namespace="app-production", service="api-service"}[5m])) by (le)
+            ) > 1
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: latency
+          annotations:
+            summary: "API Service high latency critical"
+            description: "P99 latency is above 1s (current: {{ $value | printf \"%.2f\" }}s) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-latency.md"
+
+    # ============================================
+    # Traffic Alerts
+    # ============================================
+    - name: api-service-traffic
+      rules:
+        - alert: APINoTraffic
+          expr: |
+            (
+              absent(http_requests_total{namespace="app-production", service="api-service"})
+              or
+              sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m])) == 0
+            )
+          for: 15m
+          labels:
+            severity: warning
+            service: api-service
+            signal: traffic
+          annotations:
+            summary: "API Service receiving no traffic"
+            description: "API Service has received no requests for more than 15 minutes, or metrics are missing."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-traffic.md"
+
+        - alert: APITrafficSpike
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m])) > 10
+              and
+              sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m]))
+              >
+              2 * sum(rate(http_requests_total{namespace="app-production", service="api-service"}[1h] offset 5m))
+            )
+          for: 5m
+          labels:
+            severity: warning
+            service: api-service
+            signal: traffic
+          annotations:
+            summary: "API Service traffic spike detected"
+            description: "Traffic is more than 2x the hourly average and exceeds 10 RPS threshold. Current RPS: {{ $value | printf \"%.2f\" }}"
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-traffic.md"
+
+    # ============================================
+    # Error Alerts
+    # ============================================
+    - name: api-service-errors
+      rules:
+        - alert: APIHighErrorRateWarning
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="app-production", service="api-service", status=~"5.."}[5m]))
+              /
+              clamp_min(sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m])), 1e-9)
+            ) * 100 > 1
+          for: 5m
+          labels:
+            severity: warning
+            service: api-service
+            signal: errors
+          annotations:
+            summary: "API Service error rate warning"
+            description: "5xx error rate is above 1% (current: {{ $value | printf \"%.2f\" }}%) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-errors.md"
+
+        - alert: APIHighErrorRateCritical
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="app-production", service="api-service", status=~"5.."}[5m]))
+              /
+              clamp_min(sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m])), 1e-9)
+            ) * 100 > 5
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: errors
+          annotations:
+            summary: "API Service error rate critical"
+            description: "5xx error rate is above 5% (current: {{ $value | printf \"%.2f\" }}%) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-errors.md"
+
+        - alert: APIHigh4xxRate
+          expr: |
+            (
+              sum(rate(http_requests_total{namespace="app-production", service="api-service", status=~"4.."}[5m]))
+              /
+              clamp_min(sum(rate(http_requests_total{namespace="app-production", service="api-service"}[5m])), 1e-9)
+            ) * 100 > 10
+          for: 10m
+          labels:
+            severity: warning
+            service: api-service
+            signal: errors
+          annotations:
+            summary: "API Service high 4xx rate"
+            description: "4xx error rate is above 10% (current: {{ $value | printf \"%.2f\" }}%) for more than 10 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-errors.md"
+
+    # ============================================
+    # Saturation Alerts
+    # ============================================
+    - name: api-service-saturation
+      rules:
+        - alert: APIHighCPUUsageWarning
+          expr: |
+            (
+              sum(rate(container_cpu_usage_seconds_total{namespace="app-production", pod=~"api-service.*", container!=""}[5m])) by (pod)
+              /
+              sum(kube_pod_container_resource_limits{namespace="app-production", pod=~"api-service.*", resource="cpu"}) by (pod)
+            ) * 100 > 70
+          for: 10m
+          labels:
+            severity: warning
+            service: api-service
+            signal: saturation
+          annotations:
+            summary: "API Service high CPU usage"
+            description: "Pod {{ $labels.pod }} CPU usage is above 70% (current: {{ $value | printf \"%.1f\" }}%) for more than 10 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-resources.md"
+
+        - alert: APIHighCPUUsageCritical
+          expr: |
+            (
+              sum(rate(container_cpu_usage_seconds_total{namespace="app-production", pod=~"api-service.*", container!=""}[5m])) by (pod)
+              /
+              sum(kube_pod_container_resource_limits{namespace="app-production", pod=~"api-service.*", resource="cpu"}) by (pod)
+            ) * 100 > 90
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: saturation
+          annotations:
+            summary: "API Service critical CPU usage"
+            description: "Pod {{ $labels.pod }} CPU usage is above 90% (current: {{ $value | printf \"%.1f\" }}%) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-resources.md"
+
+        - alert: APIHighMemoryUsageWarning
+          expr: |
+            (
+              sum(container_memory_working_set_bytes{namespace="app-production", pod=~"api-service.*", container!=""}) by (pod)
+              /
+              sum(kube_pod_container_resource_limits{namespace="app-production", pod=~"api-service.*", resource="memory"}) by (pod)
+            ) * 100 > 70
+          for: 10m
+          labels:
+            severity: warning
+            service: api-service
+            signal: saturation
+          annotations:
+            summary: "API Service high memory usage"
+            description: "Pod {{ $labels.pod }} memory usage is above 70% (current: {{ $value | printf \"%.1f\" }}%) for more than 10 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-resources.md"
+
+        - alert: APIHighMemoryUsageCritical
+          expr: |
+            (
+              sum(container_memory_working_set_bytes{namespace="app-production", pod=~"api-service.*", container!=""}) by (pod)
+              /
+              sum(kube_pod_container_resource_limits{namespace="app-production", pod=~"api-service.*", resource="memory"}) by (pod)
+            ) * 100 > 90
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: saturation
+          annotations:
+            summary: "API Service critical memory usage"
+            description: "Pod {{ $labels.pod }} memory usage is above 90% (current: {{ $value | printf \"%.1f\" }}%) for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-resources.md"
+
+    # ============================================
+    # Availability Alerts
+    # ============================================
+    - name: api-service-availability
+      rules:
+        - alert: APIPodNotReady
+          expr: |
+            kube_deployment_status_replicas_available{namespace="app-production", deployment="api-service"}
+            <
+            kube_deployment_spec_replicas{namespace="app-production", deployment="api-service"}
+          for: 5m
+          labels:
+            severity: warning
+            service: api-service
+            signal: availability
+          annotations:
+            summary: "API Service pods not ready"
+            description: "Available replicas ({{ $value }}) is less than desired replicas for more than 5 minutes."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-availability.md"
+
+        - alert: APIPodCrashLooping
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="app-production", pod=~"api-service.*"}[1h]) > 3
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: availability
+          annotations:
+            summary: "API Service pod crash looping"
+            description: "Pod {{ $labels.pod }} has restarted more than 3 times in the last hour."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-availability.md"
+
+        - alert: APITargetDown
+          expr: |
+            up{job="api-service", namespace="app-production"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: api-service
+            signal: availability
+          annotations:
+            summary: "API Service target down"
+            description: "Prometheus cannot scrape metrics from API Service instance {{ $labels.instance }}."
+            runbook_url: "https://github.com/saji2/eks-hands-on/blob/main/runbooks/api-availability.md"

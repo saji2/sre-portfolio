@@ -53,6 +53,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      security-events: write
 
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +77,42 @@ jobs:
             type=raw,value=${{ github.sha }}
             type=raw,value=latest
 
-      - name: Build and push Docker image
+      - name: Build Docker image (local)
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/frontend
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            VITE_API_URL=/api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: '${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+        continue-on-error: true
+        id: trivy-scan
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Fail if Trivy found vulnerabilities
+        if: steps.trivy-scan.outcome == 'failure'
+        run: |
+          echo "::error::Trivy found CRITICAL/HIGH vulnerabilities. Check the Security tab for details."
+          exit 1
+
+      - name: Push Docker image to ECR
         uses: docker/build-push-action@v5
         with:
           context: apps/frontend
@@ -127,3 +163,13 @@ jobs:
       - name: Verify deployment
         run: |
           kubectl get pods -n app-production -l app=frontend-service
+
+  notify:
+    needs: [test, build-and-push, deploy]
+    if: always()
+    uses: ./.github/workflows/slack-notification.yml
+    with:
+      status: ${{ contains(needs.*.result, 'failure') && 'failure' || 'success' }}
+      workflow_name: 'Frontend CI/CD'
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
